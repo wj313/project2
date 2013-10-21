@@ -6,6 +6,7 @@
 #define SENSOR_H
 
 typedef struct Sensor {
+	char hostName[32];//name of the host
 	int numberSensors;//total number of sensors on host
 	int currentSensor; //sensor number
 	double data;//sensor data from sensor
