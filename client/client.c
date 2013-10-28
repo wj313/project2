@@ -11,7 +11,7 @@
 #include <stdio.h>
 #include <netinet/in.h>
 #include <sys/time.h>
-#include "sensor.h"
+#include "../shared/sensor.h"
 #include <errno.h>
 #include <fcntl.h>
 #include <time.h>
@@ -44,7 +44,13 @@ int main(int argc, char *argv[])
 	//open error log
 	char *errorLog = "/var/log/therm/error/group13_error_log";
 	char errorLogChar = 'a';
-	FILE * elPtr = fopen(errorLog, &errorLogChar); 			
+	FILE * elPtr = fopen(errorLog, &errorLogChar); 	
+	if( elPtr == NULL)
+	{
+		printf("Error opening Error Log\n");
+		exit(1);
+	}
+		
 	int elPtrInt = fileno(elPtr);	
 
 	if(argc != 2)
@@ -101,7 +107,7 @@ int main(int argc, char *argv[])
 	}	
 	else
 	{
-		///From newgo,c
+		///From newgo.c
 		if((fd=open(fileName,O_RDONLY))==-1)
 		{
 			char *message = "Could not open /dev/gotemp\n";
@@ -170,7 +176,7 @@ int main(int argc, char *argv[])
 
 	//Initialize sockaddr_in
 	sin.sin_family = AF_INET;
-	sin.sin_port = htons(9774);
+	sin.sin_port = htons(PORT_NO);
 	sin.sin_addr.s_addr = inet_addr(argv[1]);
 
 	//Connect()
