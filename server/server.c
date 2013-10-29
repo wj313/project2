@@ -19,17 +19,17 @@
 //function definitions
 void errorPrint(char * message);
 
-void logMessage(Sensor sensor) {
+void logMessage(Sensor sensors[], int numberSensors) {
 	char filename[80];
     char timestamp[32];
-    memcpy(timestamp, sensor.timestamp,32);
+    memcpy(timestamp, sensors[0].timestamp,32);
     char *year, *month;
     year = strtok(timestamp, " ");
     month = strtok(NULL, " ");
 
-    sprintf(filename, "%sg%d_%s_%s_%s",LOG,GROUP_NO,year,month,sensor.hostName);
+    sprintf(filename, "%sg%d_%s_%s_%s",LOG,GROUP_NO,year,month,sensors[0].hostName);
     printf("Filename: %s\n", filename);
-    printf("Timestamp: %s\n", sensor.timestamp);
+    printf("Timestamp: %s\n", sensors[0].timestamp);
 }
 
 int main(int argc, char * argv[]) {
@@ -68,16 +68,31 @@ int main(int argc, char * argv[]) {
         if (client_socket < 0) {
             errorPrint("error - accepting client connection");
         }
+
         Sensor sensor;
         memset(&sensor, 0, sizeof sensor);
         if(read(client_socket, (void *) &sensor, sizeof sensor) < sizeof sensor) {
         	errorPrint("error - receiving sensor information");
         }
+        Sensor * sensors;
+        int numberSensors = sensor.numberSensors;
+        sensors = malloc(numberSensors * sizeof(Sensor));
+        sensors[0] = sensor;
+        if (numberSensors > 1)
+        {
+            int i;
+            for(i = 1; i < numberSensors; i++)
+                if(read(client_socket, (void *) &sensors[i], sizeof(Sensor)) < sizeof(Sensor)) {
+                    errorPrint("error - receiving sensor information");
+                }
+        }
+
         if(sensor.actionrequested == 0) {
-        	logMessage(sensor);
+        	logMessage(sensors, numberSensors);
         }
 
      }
+
 	return 0;
 }
 
