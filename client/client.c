@@ -145,7 +145,6 @@ int main(int argc, char *argv[])
 		sensorArray[0].lowvalue = atoi(strtok(NULL, delimiters));
 		sensorArray[0].highvalue = atoi(strtok(NULL, delimiters));
 		sensorArray[0].actionrequested = 0;
-
 		strcpy(sensorArray[0].timestamp, stamp1);
 		
 		if(numberOfSensors == 2)
@@ -173,7 +172,6 @@ int main(int argc, char *argv[])
 			sensorArray[1].lowvalue = atoi(strtok(NULL, delimiters));
 			sensorArray[1].highvalue = atoi(strtok(NULL, delimiters));
 			sensorArray[1].actionrequested = 0;	
-			getTimeStamp(stamp1);
 			strcpy(sensorArray[1].timestamp, stamp1);
 		}
 	}
