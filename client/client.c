@@ -4,6 +4,7 @@
 //Project 2
 
 #include <sys/types.h>
+#include <arpa/inet.h>
 #include <sys/socket.h>
 #include <string.h>
 #include <unistd.h>

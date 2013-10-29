@@ -1,8 +1,8 @@
 all: thermd
 
 
-thermd: server.c ../shared/sensor.h
-	gcc server.c ../shared/sensor.h -o thermd -Wall
+thermd: server.c
+	gcc server.c -o thermd -Wall
 
 clean:
 	rm thermd

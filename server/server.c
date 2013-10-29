@@ -14,12 +14,16 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define LOG "/var/log/therm/temp_logs/"
+
 //function definitions
 void errorPrint(char * message);
 
 void logMessage(Sensor sensor) {
-	printf("Hostname %s\n", sensor.hostName);
-	printf("Data %f\n", sensor.data);
+	char filename[80];
+    sprintf(filename, "%sg%d_%d_%d_%s",LOG,GROUP_NO,2013,10,sensor.hostName);
+    printf("Filename: %s\n", filename);
+    printf("Timestamp: %s\n", sensor.timestamp);
 }
 
 int main(int argc, char * argv[]) {

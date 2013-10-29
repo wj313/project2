@@ -7,7 +7,6 @@
 
 //constants
 #define PORT_NO 9774
-#define PATH "/var/log/therm/temp_logs"
 #define GROUP_NO 13
 
 typedef struct Sensor {
