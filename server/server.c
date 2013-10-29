@@ -22,7 +22,7 @@ void errorPrint(char * message);
 void logMessage(Sensor sensor) {
 	char filename[80];
     char timestamp[32];
-    memcpy(timestamp, sensor.timestamp)
+    memcpy(timestamp, sensor.timestamp,32);
     char *year, *month;
     year = strtok(timestamp, " ");
     month = strtok(NULL, " ");
