@@ -13,35 +13,46 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <pthread.h>
 
 #define LOG "/var/log/therm/temp_logs/"
 
 //function definitions
 void errorPrint(char * message);
+void logMessage(Sensor sensors[], int numberSensors); //takes sensor data and adds to log file
 
-void logMessage(Sensor sensors[], int numberSensors) {
-	char filename[512];
-    char timestamp[32];
-    memcpy(timestamp, sensors[0].timestamp,32);
-    char *year, *month;
-    year = strtok(timestamp, " ");
-    month = strtok(NULL, " ");
-
-    sprintf(filename, "%sg%d_%s_%s_%s",LOG,GROUP_NO,year,month,sensors[0].hostName);
-    char data[128];
-    sprintf(data, "%s %.3f", sensors[0].timestamp, sensors[0].data);
-    int i;
-    for (i = 1; i < numberSensors; i++)
-        sprintf(data, "%s %.3f", data, sensors[i].data);
-    printf("File path: %s\n", filename);
-    printf("Get Data: %s\n", data);
-    FILE * logfile = fopen(filename, "a");
-    fprintf(logfile, "%s\n",data);
+void * clientThread(void * arg) {
+   int client_socket = *(int *) arg;
+    Sensor sensor;
+    memset(&sensor, 0, sizeof sensor);
+    if(read(client_socket, (void *) &sensor, sizeof sensor) < sizeof sensor) {
+        errorPrint("error - receiving sensor information");
+    }
+    Sensor * sensors;
+    int numberSensors = sensor.numberSensors;
+    sensors = malloc(numberSensors * sizeof(Sensor));
+    sensors[0] = sensor;
+    if (numberSensors > 1)
+    {
+        int i;
+        for(i = 1; i < numberSensors; i++)
+            if(read(client_socket, (void *) &sensors[i], sizeof(Sensor)) < sizeof(Sensor)) {
+                errorPrint("error - receiving sensor information");
+            }
+    }
+    if(sensor.actionrequested == 0) {
+        logMessage(sensors, numberSensors);
+    }
+    close(client_socket);
+    pthread_exit(NULL);
 }
+
 
 int main(int argc, char * argv[]) {
     struct sockaddr_in server;
     int s, option; //create variable for socket, socket options
+    pthread_attr_t att;
+    pthread_t thread;
     
     //specify server address info and set port
     server.sin_family = AF_INET;
@@ -65,6 +76,7 @@ int main(int argc, char * argv[]) {
         errorPrint("error - listening on socket");
     }
 
+    pthread_attr_init(&att);
     while(1) {
   		struct sockaddr client;
         memset(&client, 0, sizeof(client));
@@ -75,28 +87,7 @@ int main(int argc, char * argv[]) {
         if (client_socket < 0) {
             errorPrint("error - accepting client connection");
         }
-
-        Sensor sensor;
-        memset(&sensor, 0, sizeof sensor);
-        if(read(client_socket, (void *) &sensor, sizeof sensor) < sizeof sensor) {
-        	errorPrint("error - receiving sensor information");
-        }
-        Sensor * sensors;
-        int numberSensors = sensor.numberSensors;
-        sensors = malloc(numberSensors * sizeof(Sensor));
-        sensors[0] = sensor;
-        if (numberSensors > 1)
-        {
-            int i;
-            for(i = 1; i < numberSensors; i++)
-                if(read(client_socket, (void *) &sensors[i], sizeof(Sensor)) < sizeof(Sensor)) {
-                    errorPrint("error - receiving sensor information");
-                }
-        }
-
-        if(sensor.actionrequested == 0) {
-        	logMessage(sensors, numberSensors);
-        }
+        pthread_create(&thread, &att, clientThread, &client_socket);
 
      }
 
@@ -107,4 +98,27 @@ void errorPrint(char * message) {
   //print error and errno and exit with error
   perror(message);
   exit(EXIT_FAILURE);
+}
+
+void logMessage(Sensor sensors[], int numberSensors) {
+    char filename[512];
+    char timestamp[32];
+    memcpy(timestamp, sensors[0].timestamp,32);
+    char *year, *month;
+    year = strtok(timestamp, " ");
+    month = strtok(NULL, " ");
+
+    sprintf(filename, "%sg%d_%s_%s_%s",LOG,GROUP_NO,year,month,sensors[0].hostName);
+    char data[128];
+    sprintf(data, "%s %.3f", sensors[0].timestamp, sensors[0].data);
+    int i;
+    for (i = 1; i < numberSensors; i++)
+        sprintf(data, "%s %.3f", data, sensors[i].data);
+    //printf("File path: %s\n", filename);
+    //printf("Get Data: %s\n", data);
+    FILE * logfile = fopen(filename, "a");
+    if(logfile == NULL)
+       errorPrint("error - cannot open logfile");
+    fprintf(logfile, "%s\n",data);
+    fclose(logfile);
 }
