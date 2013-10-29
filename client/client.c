@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <netinet/in.h>
 #include <sys/time.h>
-#include "sensor.h"
+#include "../shared/sensor.h"
 #include <errno.h>
 #include <fcntl.h>
 #include <time.h>
