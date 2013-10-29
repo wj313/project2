@@ -21,7 +21,11 @@ void errorPrint(char * message);
 
 void logMessage(Sensor sensor) {
 	char filename[80];
-    sprintf(filename, "%sg%d_%d_%d_%s",LOG,GROUP_NO,2013,10,sensor.hostName);
+    char *year, *month;
+    year = strtok(sensor.timestamp, " ");
+    month = strtok(NULL, " ");
+
+    sprintf(filename, "%sg%d_%s_%s_%s",LOG,GROUP_NO,year,month,sensor.hostName);
     printf("Filename: %s\n", filename);
     printf("Timestamp: %s\n", sensor.timestamp);
 }
