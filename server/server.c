@@ -29,10 +29,10 @@ void logMessage(Sensor sensors[], int numberSensors) {
 
     sprintf(filename, "%sg%d_%s_%s_%s",LOG,GROUP_NO,year,month,sensors[0].hostName);
     char data[128];
-    int size = sprintf(data, " %s %f", sensors[0].timestamp, sensors[0].data);
+    sprintf(data, "%s %f", sensors[0].timestamp, sensors[0].data);
     int i;
     for (i = 1; i < numberSensors; i++)
-        size += sprintf(data+size, "%f", sensors[i].data);
+        sprintf(data, "%s %f", data, sensors[i].data);
     printf("Data taken in: %s\n", data);
 }
 
