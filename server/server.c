@@ -22,16 +22,19 @@ void errorPrint(char * message);
 void logMessage(Sensor sensors[], int numberSensors); //takes sensor data and adds to log file
 
 void * clientThread(void * arg) {
-   int client_socket = *(int *) arg;
+    int client_socket = *(int *) arg;
     Sensor sensor;
     memset(&sensor, 0, sizeof sensor);
     if(read(client_socket, (void *) &sensor, sizeof sensor) < sizeof sensor) {
         errorPrint("error - receiving sensor information");
+	printf("error - receiving sensor information\n");
     }
+
     Sensor * sensors;
     int numberSensors = sensor.numberSensors;
     sensors = malloc(numberSensors * sizeof(Sensor));
     sensors[0] = sensor;
+
     if (numberSensors > 1)
     {
         int i;
@@ -40,7 +43,7 @@ void * clientThread(void * arg) {
                 errorPrint("error - receiving sensor information");
             }
     }
-    if(sensor.actionrequested == 0) {
+    if(sensors[0].actionrequested == 0) {
         logMessage(sensors, numberSensors);
     }
     close(client_socket);
@@ -50,9 +53,8 @@ void * clientThread(void * arg) {
 
 int main(int argc, char * argv[]) {
     struct sockaddr_in server;
-    int s, option; //create variable for socket, socket options
-    pthread_attr_t att;
-    pthread_t thread;
+
+    int s, option, *newsock; //create variable for socket, socket options
     
     //specify server address info and set port
     server.sin_family = AF_INET;
@@ -76,19 +78,19 @@ int main(int argc, char * argv[]) {
         errorPrint("error - listening on socket");
     }
 
-    pthread_attr_init(&att);
     while(1) {
-  		struct sockaddr client;
+	pthread_t child;
+  	struct sockaddr client;
         memset(&client, 0, sizeof(client));
         int client_socket = 0;
         socklen_t client_socket_length = sizeof(client);
-        
         client_socket = accept(s, &client, &client_socket_length);
         if (client_socket < 0) {
             errorPrint("error - accepting client connection");
         }
-        pthread_create(&thread, &att, clientThread, &client_socket);
-
+	newsock = malloc(1);
+	*newsock = client_socket;
+        pthread_create(&child,NULL, clientThread, (void*)newsock);
      }
 
 	return 0;
