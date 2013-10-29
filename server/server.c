@@ -29,11 +29,13 @@ void logMessage(Sensor sensors[], int numberSensors) {
 
     sprintf(filename, "%sg%d_%s_%s_%s",LOG,GROUP_NO,year,month,sensors[0].hostName);
     char data[128];
-    sprintf(data, "%s %f", sensors[0].timestamp, sensors[0].data);
+    sprintf(data, "%s %.3f", sensors[0].timestamp, sensors[0].data);
     int i;
     for (i = 1; i < numberSensors; i++)
-        sprintf(data, "%s %f", data, sensors[i].data);
-    printf("Data taken in: %s\n", data);
+        sprintf(data, "%s %.3f", data, sensors[i].data);
+    printf("Get Data: %s\n", data);
+    FILE * log = fopen(filename, "a");
+    fprintf(log, "%s\n",data);
 }
 
 int main(int argc, char * argv[]) {
