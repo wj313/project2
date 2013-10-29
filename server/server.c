@@ -33,9 +33,10 @@ void logMessage(Sensor sensors[], int numberSensors) {
     int i;
     for (i = 1; i < numberSensors; i++)
         sprintf(data, "%s %.3f", data, sensors[i].data);
+    printf("File path: %s\n", filename);
     printf("Get Data: %s\n", data);
-    FILE * log = fopen(filename, "a");
-    fprintf(log, "%s\n",data);
+    FILE * logfile = fopen(filename, "a");
+    fprintf(logfile, "%s\n",data);
 }
 
 int main(int argc, char * argv[]) {
