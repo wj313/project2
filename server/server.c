@@ -20,7 +20,7 @@
 void errorPrint(char * message);
 
 void logMessage(Sensor sensors[], int numberSensors) {
-	char filename[80];
+	char filename[512];
     char timestamp[32];
     memcpy(timestamp, sensors[0].timestamp,32);
     char *year, *month;
@@ -28,8 +28,12 @@ void logMessage(Sensor sensors[], int numberSensors) {
     month = strtok(NULL, " ");
 
     sprintf(filename, "%sg%d_%s_%s_%s",LOG,GROUP_NO,year,month,sensors[0].hostName);
-    printf("Filename: %s\n", filename);
-    printf("Timestamp: %s\n", sensors[0].timestamp);
+    char data[128];
+    int size = sprintf(data, "%s %f", sensors[0].timestamp, sensors[0].data);
+    int i;
+    for (i = 1; i < numberSensors; i++)
+        size += sprintf(data+size, "%f", sensors[i].data);
+    printf("Data taken in: %s\n", data);
 }
 
 int main(int argc, char * argv[]) {
