@@ -74,7 +74,7 @@ int main(int argc, char * argv[]) {
         errorPrint("error - binding socket");
     }
     
-    if (listen(s, 2) < 0) {
+    if (listen(s, 10) < 0) {
         errorPrint("error - listening on socket");
     }
 
