@@ -42,9 +42,10 @@ void logMessage(char *message, int fileInt);
 
 int main(int argc, char *argv[])
 {
+	sleep(7);
 
 	//open error log
-	char *errorLog = "/var/log/therm/error/group13_error_log";
+	char *errorLog = "/var/log/therm/error/g13_error_log";
 	char errorLogChar = 'a';
 	FILE * elPtr = fopen(errorLog, &errorLogChar); 	
 
@@ -136,6 +137,13 @@ int main(int argc, char *argv[])
 		}			
 		///		
 
+		if(close(fd) == -1)
+		{
+			char *message = "Could not close /dev/gotemp";
+			sprintf(finalMessage, "%s %s\n", message, stamp1);
+			logMessage(finalMessage, elPtrInt);
+		}
+
 		//Initialize Sensor struct
 		gethostname(hostName, 32);
 		strcpy(sensorArray[0].hostName, hostName);
@@ -163,6 +171,13 @@ int main(int argc, char *argv[])
 				logMessage(finalMessage, elPtrInt);
 			}
 			////
+
+			if(close(fd2) == -1)
+			{
+				char *message = "Could not close /dev/gotemp";
+				sprintf(finalMessage, "%s %s\n", message, stamp1);
+				logMessage(finalMessage, elPtrInt);
+			}
 
 			//Initialize second Sensor struct
 			strcpy(sensorArray[1].hostName, hostName);
